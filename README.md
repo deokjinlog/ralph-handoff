@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.2.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -23,13 +23,34 @@
 
 ---
 
+## 시작 전에 — 프로젝트를 먼저 만드세요
+
+**스킬은 "이미 프로젝트가 있다" 를 전제로 시작합니다.** 이 한 번만 손으로 하세요.
+
+```bash
+mkdir -p ~/projects/내프로젝트/docs && cd ~/projects/내프로젝트
+git init                                    # ← 워크트리를 뜨려면 git 이 필요합니다
+mv ~/어디/기획서.pptx docs/                  # ← 있으면. 없어도 됩니다
+printf 'docs/*.pptx\ndocs/*.pdf\n' > .gitignore
+git add .gitignore && git commit -m "chore: 초기"
+claude
+```
+
+> **★ 기획서는 "만들 프로젝트" 안에 두세요.** 플러그인 폴더가 아니라요.
+>
+> **스킬은 자기 폴더를 안 봅니다. 당신이 있는 폴더(`cwd`)를 봅니다.** 게다가 설치된 플러그인은 `~/.claude/plugins/cache/` 로 복사되는 거라, 플러그인 소스 폴더에 문서를 둬도 **아무도 못 읽습니다.**
+>
+> **기획서는 `.gitignore` 로 막는 걸 권합니다** — 회사 자료가 공개 저장소에 섞이면 안 되니까요. 뽑아낸 요구사항만 git 에 남습니다.
+
+---
+
 ## 쓰는 법
 
 ```
 /ralph-handoff
 ```
 
-또는 그냥 **"랄프한테 넘겨줘"** 라고 하면 발동합니다. 그 다음은 **묻는 말에 답하고 승인 2번**이면 됩니다.
+또는 그냥 **"랄프한테 넘겨줘"** 라고 하면 발동합니다. 그 다음은 **묻는 말에 답하고 승인 3번**이면 됩니다.
 
 ```
      │ 어디까지 맡길까요?  → 요구사항만 / 코드만

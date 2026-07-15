@@ -19,7 +19,29 @@ description: Use when the user wants to hand work to an unattended loop — "랄
 **루프를 직접 시작하지 마세요.** 마지막에 명령을 **출력만** 합니다. 루프는 사람이 겁니다 — `ralph-loop` 가 그 명령을 `hide-from-slash-command-tool` 로 막아둔 이유이기도 합니다.
 </HARD-GATE>
 
-## 전제 — `ralph-loop` 플러그인이 필요합니다
+## 전제 — 두 가지
+
+### 1. 여기가 프로젝트 폴더여야 합니다
+
+**이 스킬은 `cwd` 를 봅니다.** 자기 플러그인 폴더가 아니라요.
+
+```bash
+git rev-parse --git-dir >/dev/null 2>&1 || echo "git 저장소가 아님"
+```
+
+git 저장소가 아니면 — **`git init` 을 대신 하지 말고** 아래를 안내하고 중단하세요. 어디에 뭘 만들지는 사용자가 정할 일입니다.
+
+```bash
+mkdir -p <프로젝트>/docs && cd <프로젝트>
+git init
+mv <기획서>.pptx docs/                       # 있으면
+printf 'docs/*.pptx\ndocs/*.pdf\n' > .gitignore
+git add .gitignore && git commit -m "chore: 초기"
+```
+
+> **기획서는 프로젝트 안에 있어야 합니다.** 사용자가 플러그인 폴더에 기획서를 두는 실수가 실제로 있었습니다 — 설치된 플러그인은 `~/.claude/plugins/cache/` 로 복사되는 거라 소스 폴더의 문서는 아무도 못 읽습니다. **이 스킬은 `cwd` 기준으로만 파일을 찾으세요.**
+
+### 2. `ralph-loop` 플러그인이 필요합니다
 
 없으면 아래를 안내하고 중단하세요.
 
