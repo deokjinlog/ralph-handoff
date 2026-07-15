@@ -1,0 +1,133 @@
+<div align="center">
+
+# ralph-handoff
+
+### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
+
+<p>
+  <img alt="Version" src="https://img.shields.io/badge/version-0.1.0-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
+  <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
+</p>
+
+</div>
+
+<br/>
+
+> ## 무인 루프는 채팅을 못 봅니다.
+>
+> **파일에 없으면 없는 겁니다.**
+> 이 플러그인은 루프가 필요한 **파일 3개**를 갖춰서 워크트리에 싸주고,
+> 명령 한 줄을 출력합니다. **루프는 당신이 겁니다.**
+
+---
+
+## 쓰는 법
+
+```
+/ralph-handoff
+```
+
+또는 그냥 **"랄프한테 넘겨줘"** 라고 하면 발동합니다. 그 다음은 **묻는 말에 답하고 승인 2번**이면 됩니다.
+
+```
+     │ 어디까지 맡길까요?  → 요구사항만 / 코드만
+     │ 기획 자료 있어요?   → 파일 / 말로 / 없음
+     │ …읽고 정리…
+     │ 📄 요구사항           ← 맞나요?          승인 ①
+     │ 📄 CLAUDE.md (스택)   ← 맞나요?          승인 ②
+     │ 🌳 워크트리 만들까요? ← 뭘 지울지 목록    승인 ③
+     ▼
+     └─ "이제 이 두 줄을 치세요" (명령 출력)
+```
+
+---
+
+## ★ 루프가 받아야 하는 건 3개입니다
+
+| 파일 | 답하는 질문 | 없으면 |
+|---|---|---|
+| **`CLAUDE.md`** | **뭘로** 만드나 (스택 · 구조) | **루프가 스택을 지어냅니다** |
+| **`<slug>-requirements.md`** | **뭘** 만드나 (기술 중립) | 만들 게 없습니다 |
+| **`PROMPT.md`** | 루프가 **어떻게 도나** | 무한 루프 / 거짓 완료 |
+
+**이 플러그인이 존재하는 이유가 첫 줄입니다.**
+
+요구사항은 **일부러 기술 중립**입니다 — 그게 게이트 워크플로의 규칙이에요 (*"기술 결정은 여기 박지 마세요"*). 그래서 요구사항만 넘기면 **스택 키워드가 0건**입니다. 루프는 Flask 든 Express 든 자기 맘대로 골라요.
+
+**스택은 원래 `CLAUDE.md` 자리입니다. 자리가 비어 있는 게 문제죠.** 그래서 이 스킬은 **`CLAUDE.md` 부터 확인**하고, 없으면 기획서를 읽어 초안을 만들어 **당신 승인**을 받습니다.
+
+---
+
+## `PROMPT.md` 에 뭐가 들어가나 — 전부 실제로 터진 것들
+
+| 장치 | 뭘 막나 |
+|---|---|
+| **묻지 말고 `BLOCKED.md`** | 새벽 3시엔 답할 사람이 없습니다. 질문하면 **무한 루프** |
+| **한 반복 = 한 단계** | `auto-*` 가 다음 단계를 자동 호출 → 한 번에 다 하려다 **컨텍스트 터짐** |
+| **완료 조건에 사람이 센 숫자 금지** | 계획서엔 `22건`, 실제는 `25건` 이었습니다. **기계끼리 대조**시킵니다 |
+| **검문 관문** | **자기 답안지로 자기 채점.** 다른 목적의 서브에이전트가 계획서만 가로질러 읽습니다 |
+| **`VERIFY.md` 증거 강제** | 훅이 **9군데**에서 루프를 죽입니다 — 막지 말고 **터미널 출력을 남기게** |
+| **취소 금지** | `/ralph-loop:cancel-ralph` · 상태파일 삭제는 완료 안 됐는데 빠져나가는 문 |
+
+### 왜 번역이 필요한가
+
+게이트 워크플로는 **"막히면 멈추고 물어봐"**, 루프는 **"막히면 계속 시도"**. **정반대**입니다.
+
+질문하고 기다리면 → 멈춤 → 루프가 같은 프롬프트 재투입 → 또 질문. **무한 루프인데 아무것도 안 만들어집니다.** 그래서 모든 게이트를 *"`BLOCKED.md` 에 적고 건너뛴다"* 로 번역합니다.
+
+---
+
+## 뭘 잃는지 — 먼저 아세요
+
+| 잃는 것 | 뜻 |
+|---|---|
+| **설계의 기술 선택권** | 루프는 *"대안 비교 → **추천 자동 선택**"* 입니다. 비교는 하지만 **고르는 것도 자기가** 합니다 |
+| **계획을 검토할 사람** | 루프가 쓴 계획을 루프가 실행합니다. **자기가 쓴 걸 의심하지 않아요** |
+
+두 번째가 진짜 위험이라 **검문 관문**을 넣었지만 — 완벽하진 않습니다. **아침에 개발방향을 꼭 읽어보세요.**
+
+```bash
+git diff main..ralph/<slug> -- 'docs/features/*/*-tech-design.md'
+```
+
+### 안 맞는 경우
+
+- **기술 선택이 중요** → "코드만 맡기기" 를 고르세요
+- **요구사항이 모호** → 루프가 추측으로 메웁니다
+- **되돌리기 어려운 작업** (DB 마이그레이션 · 배포) → 전부 `BLOCKED.md` 로 갑니다. 사람이 하세요
+
+---
+
+## 설치
+
+**`ralph-loop` 가 먼저 필요합니다** — 실제 루프는 그쪽이 돌립니다.
+
+```
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin install ralph-loop@claude-plugins-official
+
+/plugin marketplace add deokjinlog/ralph-handoff
+/plugin install ralph-handoff@ralph-handoff
+```
+
+세션을 한 번 재시작한 뒤 `/ralph-handoff`.
+
+### 같이 쓰면 좋은 것
+
+[**intent-locked-workflow**](https://github.com/deokjinlog/intent-locked-workflow) — 기획서를 요구사항으로 만드는 4단계 게이트 워크플로. 있으면 이 스킬이 `brainstorming` 에 위임하고, 없으면 최소 형식으로 직접 만듭니다. **필수는 아닙니다.**
+
+---
+
+## 이 플러그인이 안 하는 것
+
+- **루프를 시작하지 않습니다.** 명령을 출력만 해요 — 사람이 겁니다
+- **현재 브랜치를 안 건드립니다.** 전부 워크트리 안에서
+- **승인 없이 아무것도 안 지웁니다**
+
+---
+
+<div align="center">
+<sub>MIT · <a href="https://github.com/anthropics/claude-plugins-official">ralph-loop</a> 필요</sub>
+</div>

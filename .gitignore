@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+__pycache__/
+*.pyc
+
+# 기획서 — 공개 저장소라 회사 문서가 섞이면 안 된다
+*.pptx
+*.pdf
+*.hwp
+*.xlsx
