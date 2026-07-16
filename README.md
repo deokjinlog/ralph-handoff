@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.3.0-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.4.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -50,9 +50,12 @@ claude
 /ralph-handoff
 ```
 
-또는 그냥 **"랄프한테 넘겨줘"** 라고 하면 발동합니다. 그 다음은 **묻는 말에 답하고 승인 3번**이면 됩니다.
+또는 그냥 **"랄프한테 넘겨줘"** 라고 하면 발동합니다.
+
+**시작하자마자 질문 계획을 먼저 알려줍니다** — 몇 번 물을 건지, 뭘 물을 건지, 나머지는 뭘 알아서 할 건지. 그래야 대응할 준비가 되니까요.
 
 ```
+     │ ℹ️ "여쭐 건 2번입니다. 나머지는 알아서."   ← 먼저 예고
      │ …docs/ 뒤져서 기획서 읽음…
      │ 기획서가 크면 → "어느 조각 넘길까요?"        ← 멈춤 ①
      │ …요구사항 + CLAUDE.md 작성…

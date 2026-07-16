@@ -10,7 +10,7 @@
     {
       "name": "ralph-handoff",
       "description": "요구사항까지만 승인하고 나머지는 무인 루프에 맡긴다 — 기획서를 요구사항으로, 스택을 CLAUDE.md 로, 루프 규칙을 PROMPT.md 로 싸서 워크트리에 넘긴다",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "source": "./",
       "homepage": "https://github.com/deokjinlog/ralph-handoff",
       "repository": "https://github.com/deokjinlog/ralph-handoff",

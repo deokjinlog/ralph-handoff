@@ -1,6 +1,6 @@
 ---
 name: ralph-handoff
-description: Use when the user wants to hand work to an unattended loop — "랄프 돌려줘", "랄프한테 넘겨", "자고 일어나면 돼 있게", "무인으로 만들어줘", "ralph-loop 준비", or explicitly invokes /ralph-handoff. Reads whatever planning material exists (pptx/pdf/md) and produces the three files an unattended loop needs — CLAUDE.md (what to build it with), requirements (what to build), PROMPT.md (how the loop runs) — then isolates them in a git worktree and prints the exact ralph-loop command. Stops the user at most twice: slice selection when the planning doc is large, and one combined approval of requirements + CLAUDE.md. Everything else is automatic. Never starts the loop itself.
+description: Use when the user wants to hand work to an unattended loop — "랄프 돌려줘", "랄프한테 넘겨", "자고 일어나면 돼 있게", "무인으로 만들어줘", "ralph-loop 준비", or explicitly invokes /ralph-handoff. Reads whatever planning material exists (pptx/pdf/md) and produces the three files an unattended loop needs — CLAUDE.md (what to build it with), requirements (what to build), PROMPT.md (how the loop runs) — then isolates them in a git worktree and prints the exact ralph-loop command. Announces its question plan up front, then stops the user at most twice: slice selection when the planning doc is large, and one combined approval of requirements + CLAUDE.md. Everything else is automatic. Never starts the loop itself.
 ---
 
 # Ralph Handoff — 요구사항까지만 승인하고 나머지를 맡긴다
@@ -54,11 +54,31 @@ git add .gitignore && git commit -m "chore: 초기"
 /plugin install ralph-loop@claude-plugins-official
 ```
 
+## ★ Step 0 — 시작하자마자 질문 계획을 예고하세요
+
+**사용자가 제일 싫어하는 건 질문 수가 아니라 "언제 끝나는지 모르는 것"입니다.** 첫 응답에 이 한 덩어리를 먼저 내세요. 그래야 사용자가 대응할 준비를 합니다.
+
+```
+ℹ️ 여쭐 건 <N>번입니다. 나머지는 알아서 하겠습니다.
+
+   ① 어느 조각을 넘길지    ← 기획서가 <N>장이라 통째로는 PRD 가 안 됩니다
+   ② 요구사항 + CLAUDE.md 승인   ← 루프가 몇 시간 돌아서, 여기가 마지막 방어선
+
+   자동으로 할 것: 기획서 읽기 · 스택 추출 · 요구사항 작성 · 커밋 ·
+                  워크트리 · PROMPT.md · 실행 명령 출력
+```
+
+**기획서가 작아서 ①이 필요 없으면 "1번입니다" 라고 하세요.** 실제 개수를 세서 말하세요 — 지어내지 말고.
+
+이 예고 없이 질문부터 던지면 **사용자는 "이게 언제 끝나지" 하며 지칩니다.**
+
 ## Checklist
 
 각 항목을 `TaskCreate` 로 만들고 순서대로 완료하세요.
 
-**질문은 두 번뿐입니다. 나머지는 알아서 하세요.**
+**질문은 예고한 만큼만. 나머지는 알아서 하세요.**
+
+0. **질문 계획 예고** — Step 0 (★ 첫 응답에)
 
 1. **기획 자료 읽고 조각 제안** — Step 2 *(★ 질문 1 — 기획서가 작으면 생략)*
 2. **요구사항 + `CLAUDE.md` 작성** — Step 3·4 (묻지 말고 그냥 쓰기)
@@ -404,7 +424,8 @@ git worktree remove ../<repo>-ralph-<slug>     # 버릴 때
 | 안티 패턴 | 이유 |
 |---|---|
 | `CLAUDE.md` 없이 넘김 | **루프가 스택을 지어낸다.** 이 스킬의 존재 이유 |
-| 질문을 두 번 넘게 함 | **이 스킬의 최대 실패.** 사용자는 "알아서 빨리"를 원해서 씀 |
+| 질문 계획을 예고 안 하고 바로 물음 | **이 스킬의 최대 실패.** 사용자는 질문 수보다 **언제 끝나는지 모르는 것**에 지친다 |
+| 예고한 것보다 많이 물음 | 예고가 거짓말이 된다. 예고한 만큼만 |
 | `brainstorming` 에 위임 (명시 요청 없이) | 게이트가 5개 더 생긴다. 직접 써라 |
 | 워크트리 만들기 전에 승인 요청 | 원본 무변경 + 한 줄로 되돌아감. 파괴적이지 않다 |
 | 현재 브랜치에서 산출물 삭제 | 원본이 사라진다. **워크트리 안에서만** |
