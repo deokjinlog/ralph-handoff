@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.8.1-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.9.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -170,7 +170,7 @@ git diff main..ralph/<slug> -- 'docs/features/*/*-tech-design.md'
 | 검색 파이프라인 | ★★★ 순수 함수 | ❌ `pytest` 출력만 |
 | 채팅 프런트 | ★★☆ 백엔드 mock 필요 | ✅ 브라우저 |
 
-그래서 이 스킬은 **볼 게 없는 조각을 고르면 "확인용 최소 화면"을 먼저 제안**합니다. 로직은 루프가 테스트로, 진짜 도는지는 아침에 당신이 브라우저로 — **디자인은 범위 밖으로 못 박아서** 루프가 CSS 에 몇 시간 쓰는 걸 막고요.
+그래서 이 스킬은 **볼 게 없는 조각을 고르면 "확인용 최소 화면"을 묻지 않고 요구사항에 넣습니다** (승인 게이트에서 빼실 수 있게). 로직은 루프가 테스트로, 진짜 도는지는 아침에 당신이 브라우저로 — **디자인은 범위 밖으로 못 박아서** 루프가 CSS 에 몇 시간 쓰는 걸 막고요.
 
 ### 안 맞는 경우
 
