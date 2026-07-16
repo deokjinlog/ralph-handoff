@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.4.0-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.5.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -61,10 +61,12 @@ claude
      │ …요구사항 + CLAUDE.md 작성…
      │ 📄 둘 다 한 번에 → "이대로 넘길까요?"        ← 멈춤 ②
      ▼
-     └─ 커밋 → 워크트리 → PROMPT.md → "이 두 줄을 치세요"
+     └─ 커밋 → (지킬 코드 있으면) 워크트리 → PROMPT.md → "이 명령을 치세요"
 ```
 
-**나머지는 안 묻습니다.** 워크트리 생성도 승인 없이 — 원본 브랜치를 안 건드리고 `git worktree remove` 한 줄로 되돌아가서 파괴적이지 않습니다.
+**나머지는 안 묻습니다.**
+
+**워크트리는 지킬 코드가 있을 때만** 만듭니다. 빈 프로젝트면 현재 폴더에서 브랜치만 파요 — 지킬 게 없는데 폴더를 늘리면 헷갈리기만 하니까요.
 
 ---
 
