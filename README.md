@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.6.0-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.7.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -117,6 +117,17 @@ claude
 ```bash
 git diff main..ralph/<slug> -- 'docs/features/*/*-tech-design.md'
 ```
+
+### ★ 눈으로 볼 게 남나 — 조각을 고를 때 같이 보세요
+
+**무인에 제일 좋은 조각이 하필 눈에 제일 안 보입니다.** 이유가 같아요 — 순수 로직은 루프가 테스트로 잘 검증하지만 볼 게 없고, 화면은 눈에 보이지만 **루프가 렌더를 검증 못 합니다** (canvas 는 브라우저 없이 판정 불가).
+
+| 조각 | 무인 적합도 | 눈으로 확인 |
+|---|---|---|
+| 검색 파이프라인 | ★★★ 순수 함수 | ❌ `pytest` 출력만 |
+| 채팅 프런트 | ★★☆ 백엔드 mock 필요 | ✅ 브라우저 |
+
+그래서 이 스킬은 **볼 게 없는 조각을 고르면 "확인용 최소 화면"을 먼저 제안**합니다. 로직은 루프가 테스트로, 진짜 도는지는 아침에 당신이 브라우저로 — **디자인은 범위 밖으로 못 박아서** 루프가 CSS 에 몇 시간 쓰는 걸 막고요.
 
 ### 안 맞는 경우
 
