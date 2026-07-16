@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.2.0-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.3.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -53,15 +53,15 @@ claude
 또는 그냥 **"랄프한테 넘겨줘"** 라고 하면 발동합니다. 그 다음은 **묻는 말에 답하고 승인 3번**이면 됩니다.
 
 ```
-     │ 어디까지 맡길까요?  → 요구사항만 / 코드만
-     │ 기획 자료 있어요?   → 파일 / 말로 / 없음
-     │ …읽고 정리…
-     │ 📄 요구사항           ← 맞나요?          승인 ①
-     │ 📄 CLAUDE.md (스택)   ← 맞나요?          승인 ②
-     │ 🌳 워크트리 만들까요? ← 뭘 지울지 목록    승인 ③
+     │ …docs/ 뒤져서 기획서 읽음…
+     │ 기획서가 크면 → "어느 조각 넘길까요?"        ← 멈춤 ①
+     │ …요구사항 + CLAUDE.md 작성…
+     │ 📄 둘 다 한 번에 → "이대로 넘길까요?"        ← 멈춤 ②
      ▼
-     └─ "이제 이 두 줄을 치세요" (명령 출력)
+     └─ 커밋 → 워크트리 → PROMPT.md → "이 두 줄을 치세요"
 ```
+
+**나머지는 안 묻습니다.** 워크트리 생성도 승인 없이 — 원본 브랜치를 안 건드리고 `git worktree remove` 한 줄로 되돌아가서 파괴적이지 않습니다.
 
 ---
 

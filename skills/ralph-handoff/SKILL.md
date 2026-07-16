@@ -1,6 +1,6 @@
 ---
 name: ralph-handoff
-description: Use when the user wants to hand work to an unattended loop — "랄프 돌려줘", "랄프한테 넘겨", "자고 일어나면 돼 있게", "무인으로 만들어줘", "ralph-loop 준비", or explicitly invokes /ralph-handoff. Walks the user through AskUserQuestion gates to produce the three files an unattended loop needs (CLAUDE.md = what to build it with, requirements = what to build, PROMPT.md = how the loop runs), isolates them in a git worktree, and prints the exact ralph-loop command. Never starts the loop itself.
+description: Use when the user wants to hand work to an unattended loop — "랄프 돌려줘", "랄프한테 넘겨", "자고 일어나면 돼 있게", "무인으로 만들어줘", "ralph-loop 준비", or explicitly invokes /ralph-handoff. Reads whatever planning material exists (pptx/pdf/md) and produces the three files an unattended loop needs — CLAUDE.md (what to build it with), requirements (what to build), PROMPT.md (how the loop runs) — then isolates them in a git worktree and prints the exact ralph-loop command. Stops the user at most twice: slice selection when the planning doc is large, and one combined approval of requirements + CLAUDE.md. Everything else is automatic. Never starts the loop itself.
 ---
 
 # Ralph Handoff — 요구사항까지만 승인하고 나머지를 맡긴다
@@ -8,13 +8,17 @@ description: Use when the user wants to hand work to an unattended loop — "랄
 **당신은 "뭘 만들지"까지만 정합니다. 나머지는 자고 일어나면 돼 있습니다.**
 
 ```
-당신 │ 기획 자료 (있으면) → 질문 몇 개 → 승인 2번        ← 여기까지
+당신 │ (기획서가 크면) 어느 조각? → 요구사항+CLAUDE.md 승인   ← 딱 두 번
      ▼
-랄프 │ 개발방향 → 구현계획서 → 코드 → 검증               ← 무인
+랄프 │ 개발방향 → 구현계획서 → 코드 → 검증                   ← 무인
 ```
 
 <HARD-GATE>
-이 스킬은 **워크트리를 만들고 파일을 지웁니다.** 그래서 **파괴적 동작 전에 반드시 `AskUserQuestion` 으로 승인**을 받습니다. 승인 없이 `git worktree` · `git rm` · `rm` 을 실행하지 마세요.
+**질문을 두 번 넘게 하지 마세요.** 조각 선택(기획서가 클 때만)과 최종 승인, 그게 끝입니다. 사용자는 "알아서 빨리"를 원해서 이걸 씁니다.
+
+**요구사항과 `CLAUDE.md` 는 반드시 승인받으세요.** 루프가 몇 시간 도는데 방향이 틀리면 전부 버립니다. 단 **둘을 묶어서 한 번에** 물으세요.
+
+**현재 브랜치를 절대 건드리지 마세요.** 삭제는 워크트리 안에서만. 원본이 남아야 되돌릴 수 있습니다.
 
 **루프를 직접 시작하지 마세요.** 마지막에 명령을 **출력만** 합니다. 루프는 사람이 겁니다 — `ralph-loop` 가 그 명령을 `hide-from-slash-command-tool` 로 막아둔 이유이기도 합니다.
 </HARD-GATE>
@@ -54,13 +58,34 @@ git add .gitignore && git commit -m "chore: 초기"
 
 각 항목을 `TaskCreate` 로 만들고 순서대로 완료하세요.
 
-1. **어디까지 맡길지 확인** — Step 1
-2. **기획 자료 확인** — Step 2
-3. **요구사항 확보** — Step 3 (없으면 `brainstorming` 위임)
-4. **`CLAUDE.md` 확보** — Step 4 (★ 가장 자주 빠지는 것)
-5. **워크트리 생성** — Step 5
-6. **`PROMPT.md` 작성** — Step 6
-7. **실행 명령 출력** — Step 7 (직접 실행 X)
+**질문은 두 번뿐입니다. 나머지는 알아서 하세요.**
+
+1. **기획 자료 읽고 조각 제안** — Step 2 *(★ 질문 1 — 기획서가 작으면 생략)*
+2. **요구사항 + `CLAUDE.md` 작성** — Step 3·4 (묻지 말고 그냥 쓰기)
+3. **둘 다 한 번에 보여주고 승인** — *(★ 질문 2 — 마지막 방어선)*
+4. **워크트리 + `PROMPT.md`** — Step 5·6 (승인 없이 자동)
+5. **실행 명령 출력** — Step 7 (직접 실행 X)
+
+## ★★ 사용자를 딱 두 번만 멈춰라 ★★
+
+**이 스킬의 성패는 질문 수입니다.** 사용자는 "알아서 빨리"를 원해서 무인 루프를 씁니다. 물을 게 많으면 그냥 자기가 하고 말죠.
+
+| 멈추는 곳 | 왜 못 빼나 |
+|---|---|
+| **① 조각 선택** *(기획서가 클 때만)* | 30장짜리 발표자료를 어떻게 자를지는 **사람만** 압니다. 통째로는 PRD 가 안 돼요 |
+| **② 요구사항 + `CLAUDE.md` 묶어서 1번** | 루프가 **몇 시간** 돕니다. 방향이 틀리면 **전부 버립니다.** 이게 마지막 방어선 |
+
+**그 외는 전부 알아서 하세요. 묻지 마세요:**
+
+| 묻지 말 것 | 대신 |
+|---|---|
+| "어디까지 맡길까요?" | **기본 = 요구사항만 주고 나머지 전부.** 사용자가 "코드만" 이라 말했을 때만 다르게 |
+| "기획 자료 있어요?" | **`docs/` 를 그냥 찾아보세요.** 있으면 읽고, 없으면 그때 한 줄 물어보세요 |
+| "PRD? 소크라테스?" · "카테고리?" · "질문 계획 볼까요?" | **`brainstorming` 에 위임하지 마세요.** 게이트가 5개 더 생깁니다. 아래 형식으로 **직접 쓰세요** |
+| "워크트리 만들까요?" | **그냥 만드세요.** 원본 브랜치를 안 건드리고 `git worktree remove` 한 줄로 되돌아갑니다 — **파괴적이지 않습니다** |
+| "커밋할까요?" | 그냥 하세요. 워크트리 안입니다 |
+
+> **`brainstorming` 위임은 사용자가 명시로 요청할 때만.** 그 스킬은 라우터·모드·카테고리·질문계획·승인으로 게이트가 5개입니다. 여기선 **직접 쓰는 게 맞습니다** — 어차피 사용자가 마지막 승인에서 다 봅니다.
 
 ---
 
@@ -80,47 +105,13 @@ git add .gitignore && git commit -m "chore: 초기"
 
 ---
 
-## Step 1 — 어디까지 맡길지
+## Step 2 — 기획 자료 (묻지 말고 찾으세요)
 
-`AskUserQuestion`:
-
-```json
-{
-  "question": "어디까지 무인 루프에 맡길까요?",
-  "header": "맡길 범위",
-  "multiSelect": false,
-  "options": [
-    {"label": "요구사항만 주고 나머지 전부 (권장)",
-     "description": "설계·계획·코드를 루프가 만듭니다. 기술 선택권을 넘기는 대신 당신은 승인 2번만"},
-    {"label": "계획까지 사람이, 코드만 루프에게",
-     "description": "설계·계획을 직접 검토하고 승인합니다. 기술 선택이 중요한 프로젝트라면 이쪽"}
-  ]
-}
+```bash
+ls docs/*.pptx docs/*.pdf docs/*.md 2>/dev/null
 ```
 
-**"코드만" 을 고르면** — 요구사항·개발방향·구현계획서가 **전부 승인된 상태**여야 합니다. 하나라도 미승인이면 그걸 알리고 중단하세요.
-
-## Step 2 — 기획 자료
-
-`AskUserQuestion`:
-
-```json
-{
-  "question": "기획 자료가 있나요? 있으면 그걸 읽어서 요구사항과 스택을 뽑습니다.",
-  "header": "기획 자료",
-  "multiSelect": false,
-  "options": [
-    {"label": "있습니다 — 파일이 프로젝트 안에 있어요",
-     "description": "pptx · pdf · 워드 · md 뭐든. 다음 턴에 경로를 알려주시면 읽습니다"},
-    {"label": "있습니다 — 지금 말로 설명할게요",
-     "description": "채팅으로 붙여넣거나 설명해주세요"},
-    {"label": "없습니다 — 대화하면서 정할게요",
-     "description": "질문을 주고받으며 요구사항을 만듭니다"}
-  ]
-}
-```
-
-**파일이 있다면 실제로 읽으세요.** `.pptx` 는 zip 이라 파이썬으로 텍스트를 뽑을 수 있습니다:
+**있으면 그냥 읽으세요.** 없을 때만 한 줄 물어보세요 — "기획 자료가 있나요? 경로를 알려주시거나, 만들 걸 말씀해주세요." `.pptx` 는 zip 이라 파이썬으로 텍스트를 뽑을 수 있습니다:
 
 ```bash
 python3 -c "
@@ -147,14 +138,12 @@ sed -n '/^## 변경이력/,$p' "$F"/*-requirements.md 2>/dev/null | grep -c '^- 
 
 | 상태 | 할 일 |
 |---|---|
-| 엔트리 ≥ 1 | ✅ 통과 — Step 4 로 |
-| 파일은 있는데 엔트리 0 | **쓰다 만 것.** 승인부터 받으세요 |
-| 파일 없음 · `intent-locked-workflow` 설치됨 | **`brainstorming` 스킬에 위임** — Step 2 에서 확인한 기획 자료를 입력으로 |
-| 파일 없음 · 미설치 | 사용자와 직접 요구사항을 만드세요 (아래 최소 형식) |
+| 엔트리 ≥ 1 | ✅ 이미 승인된 것 — Step 4 로 |
+| 없거나 엔트리 0 | **직접 쓰세요.** 아래 형식으로. 묻지 말고 |
 
-**`brainstorming` 에 위임했다면** — 그게 끝나고 자동으로 `tech-design` 으로 넘어가려 합니다. **Step 1 에서 "요구사항만" 을 골랐으면 거기서 멈추게 하세요.**
+> **`brainstorming` 에 위임하지 마세요** — 사용자가 명시로 요청하지 않는 한. 그 스킬은 라우터·모드·카테고리·질문계획·승인으로 **게이트가 5개 더** 생깁니다. 여기선 직접 쓰는 게 맞아요. 어차피 사용자가 마지막 승인에서 다 봅니다.
 
-### 요구사항 최소 형식 (직접 만들 때)
+### 요구사항 형식 — 이대로 쓰세요
 
 기술 용어를 **넣지 마세요.** 스택은 `CLAUDE.md` 자리입니다.
 
@@ -202,11 +191,50 @@ test -f CLAUDE.md && grep -ciE 'FastAPI|Django|Express|Spring|React|Vue|Next|Pos
 ## 지금 단계에서 하지 않는 것   ← 요구사항 §5 와 일치시킬 것
 ```
 
-**초안을 보여주고 `AskUserQuestion` 으로 승인받으세요.** 스택은 사람이 확정해야 합니다 — 루프가 고르면 되돌릴 수 없어요. 승인 후 커밋합니다.
+**여기서 따로 묻지 마세요.** 요구사항과 함께 **한 번에** 보여주고 승인받습니다 (바로 아래).
 
-## Step 5 — 워크트리 생성
+## ★ 승인 — 딱 한 번. 여기가 마지막 방어선
 
-**파괴적 동작입니다. `AskUserQuestion` 으로 승인받으세요.** 뭘 만들고 뭘 지울지 목록으로 보여준 뒤에요.
+**요구사항과 `CLAUDE.md` 를 한 메시지에** 보여주세요. 루프가 몇 시간 도는데 방향이 틀리면 **전부 버립니다.**
+
+보여줄 때 **핵심만** 추려서 — 전문을 다 붙이지 말고:
+
+```
+📄 요구사항 — <슬러그>
+   FR   <N>개   (한 줄씩)
+   NFR  <N>개
+   AC   <N>개
+   범위 밖  <N>건   ← 이게 루프의 울타리입니다
+
+📄 CLAUDE.md — 고정할 스택
+   <층> : <무엇>     (표로)
+
+파일 경로도 같이 적어주세요. 전문은 열어보시면 됩니다.
+```
+
+`AskUserQuestion`:
+
+```json
+{
+  "question": "이대로 무인 루프에 넘길까요? 루프가 이 두 문서만 보고 몇 시간 만듭니다.",
+  "header": "넘기기 전 확인",
+  "multiSelect": false,
+  "options": [
+    {"label": "네 — 워크트리 싸주세요",
+     "description": "요구사항·CLAUDE.md 커밋 → 워크트리 → PROMPT.md → 실행 명령 출력"},
+    {"label": "고칠 게 있어요",
+     "description": "뭘 고칠지 말씀해주시면 반영하고 다시 보여드립니다"}
+  ]
+}
+```
+
+**"고칠 게 있어요" 면** — 고치고 **다시 이 게이트 한 번만.** 매번 묻지 마세요.
+
+승인되면 **묻지 말고 끝까지 가세요** (커밋 → 워크트리 → `PROMPT.md` → 명령 출력).
+
+## Step 5 — 워크트리 생성 (승인 후 자동)
+
+**승인받지 마세요. 그냥 만드세요.** 원본 브랜치를 안 건드리고 `git worktree remove` 한 줄로 되돌아갑니다.
 
 ```bash
 git status --porcelain          # 비어 있어야 함. 아니면 커밋/stash 안내 후 중단
@@ -376,7 +404,9 @@ git worktree remove ../<repo>-ralph-<slug>     # 버릴 때
 | 안티 패턴 | 이유 |
 |---|---|
 | `CLAUDE.md` 없이 넘김 | **루프가 스택을 지어낸다.** 이 스킬의 존재 이유 |
-| 승인 없이 워크트리·삭제 | 파괴적 동작. `AskUserQuestion` 먼저 |
+| 질문을 두 번 넘게 함 | **이 스킬의 최대 실패.** 사용자는 "알아서 빨리"를 원해서 씀 |
+| `brainstorming` 에 위임 (명시 요청 없이) | 게이트가 5개 더 생긴다. 직접 써라 |
+| 워크트리 만들기 전에 승인 요청 | 원본 무변경 + 한 줄로 되돌아감. 파괴적이지 않다 |
 | 현재 브랜치에서 산출물 삭제 | 원본이 사라진다. **워크트리 안에서만** |
 | 루프를 직접 시작 | 사람이 겁니다. 명령을 **출력만** |
 | 완료 조건 숫자를 사람이 셈 | 22 vs 25 회귀 |
