@@ -1,6 +1,6 @@
 ---
 name: ralph-handoff
-description: Use when the user wants to hand work to an unattended loop — "랄프 돌려줘", "랄프한테 넘겨", "자고 일어나면 돼 있게", "무인으로 만들어줘", "ralph-loop 준비", or explicitly invokes /ralph-handoff. Reads whatever planning material exists (pptx/pdf/md) and produces the three files an unattended loop needs — CLAUDE.md (what to build it with), requirements (what to build), PROMPT.md (how the loop runs) — then isolates them in a git worktree and prints the exact ralph-loop command. Announces its question plan up front, then stops the user at most twice: slice selection when the planning doc is large, and one combined approval of requirements + CLAUDE.md. Everything else is automatic. Never starts the loop itself.
+description: Use when the user wants to hand work to an unattended loop — "랄프 돌려줘", "랄프한테 넘겨", "자고 일어나면 돼 있게", "무인으로 만들어줘", "ralph-loop 준비", or explicitly invokes /ralph-handoff. Reads whatever planning material exists (pptx/pdf/md) — or runs a bounded schema interview when none exists — and produces the three files an unattended loop needs — CLAUDE.md (what to build it with), requirements (what to build), PROMPT.md (how the loop runs) — then isolates them in a git worktree and prints the exact ralph-loop command. Announces its question plan up front, then stops the user at most twice: slice selection when the planning doc is large, and one combined approval of requirements + CLAUDE.md. Everything else is automatic. Never starts the loop itself.
 ---
 
 # Ralph Handoff — 요구사항까지만 승인하고 나머지를 맡긴다
@@ -8,13 +8,13 @@ description: Use when the user wants to hand work to an unattended loop — "랄
 **당신은 "뭘 만들지"까지만 정합니다. 나머지는 자고 일어나면 돼 있습니다.**
 
 ```
-당신 │ (기획서가 크면) 어느 조각? → 요구사항+CLAUDE.md 승인   ← 딱 두 번
+당신 │ (기획서 크면) 조각 선택 · (없으면) 인터뷰 3~5문 → 요구사항+CLAUDE.md 승인   ← 멈춤은 승인 1번
      ▼
 랄프 │ 개발방향 → 구현계획서 → 코드 → 검증                   ← 무인
 ```
 
 <HARD-GATE>
-**질문을 두 번 넘게 하지 마세요.** 조각 선택(기획서가 클 때만)과 최종 승인, 그게 끝입니다. 사용자는 "알아서 빨리"를 원해서 이걸 씁니다.
+**질문을 두 번 넘게 하지 마세요.** 조각 선택(기획서가 클 때만)과 최종 승인, 그게 끝입니다. 사용자는 "알아서 빨리"를 원해서 이걸 씁니다. **예외 — 기획서가 아예 없으면** 조각 선택 대신 **예산 인터뷰(3~5문, Step 2)** 로 요구사항을 채웁니다. 질문 수는 늘지만 **멈춤(승인)은 여전히 1번**입니다.
 
 **요구사항과 `CLAUDE.md` 는 반드시 승인받으세요.** 루프가 몇 시간 도는데 방향이 틀리면 전부 버립니다. 단 **둘을 묶어서 한 번에** 물으세요.
 
@@ -70,6 +70,8 @@ git add .gitignore && git commit -m "chore: 초기"
 
 **기획서가 작아서 ①이 필요 없으면 "1번입니다" 라고 하세요.** 실제 개수를 세서 말하세요 — 지어내지 말고.
 
+**기획서가 아예 없으면** → ① 대신 **스키마 인테이크**입니다. 예고를 이렇게: *"기획 자료가 없어 빈 슬롯 N개를 최대 3~5문으로 채우고, 나머지는 기본값으로 제안 → 그다음 요구사항+CLAUDE.md 승인 1번."* (규칙: [`references/requirements-schema.md`](references/requirements-schema.md))
+
 이 예고 없이 질문부터 던지면 **사용자는 "이게 언제 끝나지" 하며 지칩니다.**
 
 ## Checklist
@@ -81,7 +83,7 @@ git add .gitignore && git commit -m "chore: 초기"
 0. **질문 계획 예고** — Step 0 (★ 첫 응답에)
 0-1. **기획서 gitignore 검증** — Step 2 (★ 회사 자료 유출 방지)
 
-1. **기획 자료 읽고 조각 제안** — Step 2 *(★ 질문 1 — 기획서가 작으면 생략)*
+1. **기획 자료 읽고 조각 제안** — Step 2 *(★ 질문 1 — 기획서가 작으면 생략 · 없으면 스키마 인테이크)*
 2. **요구사항 + `CLAUDE.md` 작성** — Step 3·4 (묻지 말고 그냥 쓰기)
    ↳ 조각의 `눈으로 확인` 이 ❌ 면 **확인용 화면 FR 을 무조건 포함**
 3. **둘 다 한 번에 보여주고 승인** — *(★ 질문 2 — 마지막 방어선)*
@@ -96,6 +98,8 @@ git add .gitignore && git commit -m "chore: 초기"
 |---|---|
 | **① 조각 선택** *(기획서가 클 때만)* | 30장짜리 발표자료를 어떻게 자를지는 **사람만** 압니다. 통째로는 PRD 가 안 돼요 |
 | **② 요구사항 + `CLAUDE.md` 묶어서 1번** | 루프가 **몇 시간** 돕니다. 방향이 틀리면 **전부 버립니다.** 이게 마지막 방어선 |
+
+> **기획서가 없으면** ① 자리에 **예산 인터뷰(3~5문, Step 2)** 가 들어갑니다 — 조각이 아니라 빈 슬롯을 채우려고. 그래도 **멈춤(승인)은 ② 한 번뿐.** 이 인터뷰만 아래 "묻지 마세요" 의 예외입니다 (안 물으면 정보가 안 옵니다).
 
 **그 외는 전부 알아서 하세요. 묻지 마세요:**
 
@@ -133,7 +137,7 @@ git add .gitignore && git commit -m "chore: 초기"
 ls docs/*.pptx docs/*.pdf docs/*.md 2>/dev/null
 ```
 
-**있으면 그냥 읽으세요.** 없을 때만 한 줄 물어보세요 — "기획 자료가 있나요? 경로를 알려주시거나, 만들 걸 말씀해주세요." `.pptx` 는 zip 이라 파이썬으로 텍스트를 뽑을 수 있습니다:
+**있으면 그냥 읽으세요** (아래 pptx 추출). **없으면 → 스키마 인테이크** — 아래 ★ 절에서 빈 슬롯을 예산 인터뷰로 채웁니다 (한 줄로 지어내지 마세요). `.pptx` 는 zip 이라 파이썬으로 텍스트를 뽑을 수 있습니다:
 
 ```bash
 python3 -c "
@@ -146,6 +150,18 @@ for i, s in enumerate(slides, 1):
     print(f'--- slide {i}\n{re.sub(chr(92)+chr(115)+chr(43), chr(32), t).strip()}')
 " '<경로>'
 ```
+
+### ★ 기획서가 없으면 — 스키마 인테이크 (자유 문답이 아니다)
+
+기획서가 없으면 정보가 당신한테서 와야 합니다. 하지만 **흥미 위주로 무한정 묻지 마세요.** [`references/requirements-schema.md`](references/requirements-schema.md) 의 **빈 슬롯을 채우는 최소 질문**만 합니다.
+
+**이건 "질문 두 번만" 을 깨지 않습니다** — 기획서 있을 때의 2번(조각+승인)과 **다른 레짐**일 뿐입니다. no-doc 엔 조각 선택(멈춤 ①)이 없고, **인터뷰 → 요구사항 → 승인(멈춤 ②) 한 번**으로 끝납니다. 원칙은 그대로: **예고 · 예산 · 기본값.**
+
+1. **먼저 예고** (Step 0 형식): "빈 슬롯 N개, 최대 3~5문, 나머지는 기본값+근거."
+2. **질문 1개 = 슬롯 1개 이상.** persona → 핵심 저니 → 만들거나-부수는 제약 하나. **가장 추측을 줄이는 것부터.** 못 닫는 흥미 질문 금지.
+3. **예산 소진 → 빈 슬롯을 "기본값 + 근거 1줄"** 로 채우고 `[기본값]` 표시. 승인 게이트에서 한 번에.
+4. **그린필드로 스택을 모르면** 스택도 같은 예산 안에서 1문 물어 `CLAUDE.md` 로 보냅니다 — Step 4 가 **따로 멈춰 묻지 않게** (요구사항은 기술 중립, 스택은 CLAUDE.md 자리).
+5. **완료 산출물은 Step 3 의 요구사항 형식과 동일** — 이후 흐름(CLAUDE.md → 승인 → 커밋 → PROMPT.md)은 그대로.
 
 ### ★ 읽자마자 — 기획서가 커밋될지 **확인하세요**
 
@@ -286,7 +302,7 @@ test -f CLAUDE.md && grep -ciE 'FastAPI|Django|Express|Spring|React|Vue|Next|Pos
 
 1. **기획 자료** (Step 2) — 고정된 스택이 적혀 있는 경우가 많습니다
 2. **기존 코드** — `package.json` · `pyproject.toml` · `requirements.txt` · import 문
-3. **둘 다 없으면 `AskUserQuestion` 으로 물어보세요.** 지어내지 마세요
+3. **둘 다 없으면** — no-doc 인테이크(Step 2)에서 스택을 이미 물었으면 그걸 쓰고, 아니면 `AskUserQuestion` 으로 **한 번만** 물어보세요. 지어내지 마세요
 
 초안 형식:
 
@@ -517,6 +533,16 @@ REVIEW.md 있음             → 체크 안 된 첫 task
 | 계획에 없는 새 의존성 | `BLOCKED.md` → 건너뜀 |
 | **요구사항이 틀린 것 같음** | **`BLOCKED.md` → 멈춤. 절대 고치지 마라** |
 
+**★ `BLOCKED.md` 엔트리는 4열로 구조화해라** — 아침 트리아지가 한눈에 되게, 그리고 병렬 루프(증분4)에서 여러 BLOCKED 를 모을 때 그대로 표가 되게:
+
+```markdown
+| 막힌 것 | 왜 | 루프가 제안하는 기본안 | 승인 시 명령 |
+|---|---|---|---|
+| <한 줄> | <사유> | <사람이 OK 만 하면 될 안> | <있으면 실행할 명령> |
+```
+
+자유 서술로 쓰지 마라. 사람의 역할이 **"요구사항 승인 + 아침 트리아지"** 두 지점으로 고정된다.
+
 ### 6-7. 금지 목록에 반드시 넣을 것
 
 | 금지 | 왜 |
@@ -633,6 +659,9 @@ git worktree remove ../<repo>-ralph-<slug>     # 버릴 때
 | flaky E2E 를 무한 재시도 | 루프가 헛돈다. `retries:1` + flaky 면 `BLOCKED.md` 로 강등 |
 | Playwright 를 MCP 서버로 붙임 | 매 반복 컨텍스트만 먹는다. `npx playwright` CLI 를 bash 로 |
 | 능력 감지를 `--version` 으로만 함 | 브라우저는 못 뜨는데 OK 로 오판 → 런타임 실패. 실제 launch 를 찍어봐라 |
+| 기획서 없는데 인터뷰 없이 한 줄로 요구사항 지어냄 | 슬롯이 비어 루프가 추측으로 메운다. 스키마 인터뷰로 채워라 |
+| no-doc 인터뷰를 예고·예산 없이 함 | Step 0 예고가 거짓말이 된다. 예고·예산·기본값 |
+| `BLOCKED.md` 를 자유 서술로 씀 | 아침 트리아지가 안 된다. 4열 구조화 |
 
 ## Related
 
