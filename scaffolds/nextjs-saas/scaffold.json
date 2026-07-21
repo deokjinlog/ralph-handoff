@@ -1,0 +1,25 @@
+{
+  "name": "nextjs-saas",
+  "description": "Next.js + 인증 + Stripe 스텁 + 멀티테넌시 골든 스캐폴드 (웹 SaaS)",
+  "fits": "웹 기반 SaaS — 대시보드·인증·구독 과금이 있는 제품",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/nextjs/saas-starter",
+    "pin": "<채택 전 특정 커밋 SHA 로 고정 — 사내 포크 권장>",
+    "note": "채택 전 최신 상태·라이선스를 사람이 직접 확인한다. 스타터는 빠르게 변한다. 이 URL 은 시작점일 뿐 검증은 사람 몫."
+  },
+  "design_system": "shadcn/ui — 컴포넌트 신규 제작 금지, 조합만",
+  "locked_paths": [
+    "lib/auth/**",
+    "lib/payments/**",
+    "middleware.ts",
+    "app/(login)/**"
+  ],
+  "domain_paths": [
+    "app/(dashboard)/**",
+    "lib/db/schema.ts",
+    "components/features/**"
+  ],
+  "verify_bootstrap": "pnpm install && pnpm build && pnpm test",
+  "dev_server": "pnpm dev"
+}

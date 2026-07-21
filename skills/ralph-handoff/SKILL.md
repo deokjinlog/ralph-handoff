@@ -323,6 +323,16 @@ test -f CLAUDE.md && grep -ciE 'FastAPI|Django|Express|Spring|React|Vue|Next|Pos
 ## 지금 단계에서 하지 않는 것   ← 요구사항 §5 와 일치시킬 것
 ```
 
+### ★ 골든 스캐폴드 — 배관을 루프가 안 짜게 (웹 SaaS 그린필드, opt-in)
+
+프로젝트가 **웹 SaaS**(대시보드·인증·구독 과금)이고 **그린필드**면, 스택을 밑바닥부터 짜게 두지 마세요. 인증·과금·멀티테넌시 배관은 루프가 매번 새로 짜면 **매번 다르게 틀립니다.** `scaffolds/` 에 맞는 게 있으면(지금은 `nextjs-saas`) **묻지 말고 초안에 넣으세요** — 확인용 화면 FR 과 같은 "넣어두고 빼게" 규칙, 승인 게이트에서 빼면 됩니다.
+
+- 적용하면(승인 후 Step 5): 클론 → `verify_bootstrap` 로 **깔린 직후 green 커밋** → `CLAUDE.partial.md` 병합. 상세: [`references/scaffold.md`](references/scaffold.md)
+- **새 멈춤을 만들지 마세요.** 채택 여부는 승인 게이트에서 한 줄로 보여주고 빼게 합니다.
+- **웹 SaaS 가 아니면**(Python 백엔드·모바일·CLI…) 스캐폴드 없이 오늘 흐름 그대로. **한 스택은 한 시장만.**
+
+> 연결: 스캐폴드가 `dev 서버` 명령을 `CLAUDE.md` 에 넣어주므로 **증분1 브라우저 검증(6-8) 능력 감지가 더 자주 통과**하고, `locked_paths` 수정·허용목록 밖 의존성은 **6-6 런타임 규칙이 `BLOCKED.md` 로 강등**합니다 (배관은 읽기 전용) — 새 게이트 없음. (③.5 검문 관문은 코드를 안 봐서 이건 검문이 아니라 런타임 규칙 몫)
+
 **여기서 따로 묻지 마세요.** 요구사항과 함께 **한 번에** 보여주고 승인받습니다 (바로 아래).
 
 ## ★ 승인 — 딱 한 번. 여기가 마지막 방어선
@@ -403,6 +413,20 @@ git commit -q -m "chore: 무인 실행용 — 요구사항만 남김"
 **`-requirements.md` 와 `CLAUDE.md` 는 절대 지우지 마세요.** 그게 넘기는 대상입니다.
 
 이미 워크트리가 있으면 **덮어쓰지 말고** 경로를 보고한 뒤 중단하세요.
+
+### ★ 스캐폴드 적용 (Step 4 에서 채택했으면, 격리 안에서)
+
+```bash
+# 격리 폴더엔 이미 CLAUDE.md·requirements·.git 이 있다 → 빈 폴더 클론이 안 된다. 임시로 받아 내용만 얹는다:
+git clone --depth 1 <source.url> .scaffold-tmp
+rm -rf .scaffold-tmp/.git && cp -rn .scaffold-tmp/. . && rm -rf .scaffold-tmp   # -n: 기존 .gitignore·CLAUDE.md·requirements 보존
+pnpm install && pnpm build && pnpm test          # verify_bootstrap — "깔린 직후 green" 증명
+git add -A && git commit -q -m "chore: 스캐폴드 baseline (green)"
+```
+
+그다음 스캐폴드의 `CLAUDE.partial.md`(플러그인 안) 를 프로젝트 `CLAUDE.md` **뒤에 붙입니다** — `locked_paths` 규칙이 여기서 `CLAUDE.md` 로 들어갑니다.
+
+**green 이 안 나오면 클론을 버리고 스캐폴드 없이 진행하세요** — 스타터가 낡았을 수 있습니다. 사람에게 한 줄 알림. (상세: [`references/scaffold.md`](references/scaffold.md))
 
 ## Step 6 — `PROMPT.md` 작성
 
@@ -531,6 +555,7 @@ REVIEW.md 있음             → 체크 안 된 첫 task
 | 자가 복구 3회 실패 | `BLOCKED.md` → 건너뜀 |
 | 외부 호출 (`git push` · PR · 외부 API) | **절대 금지.** 로컬 커밋까지만 |
 | 계획에 없는 새 의존성 | `BLOCKED.md` → 건너뜀 |
+| **`locked_paths` 수정 시도** (스캐폴드 배관) | **`BLOCKED.md` → 건너뜀.** 읽기 전용, 우회 금지 |
 | **요구사항이 틀린 것 같음** | **`BLOCKED.md` → 멈춤. 절대 고치지 마라** |
 
 **★ `BLOCKED.md` 엔트리는 4열로 구조화해라** — 아침 트리아지가 한눈에 되게, 그리고 병렬 루프(증분4)에서 여러 BLOCKED 를 모을 때 그대로 표가 되게:
@@ -662,6 +687,9 @@ git worktree remove ../<repo>-ralph-<slug>     # 버릴 때
 | 기획서 없는데 인터뷰 없이 한 줄로 요구사항 지어냄 | 슬롯이 비어 루프가 추측으로 메운다. 스키마 인터뷰로 채워라 |
 | no-doc 인터뷰를 예고·예산 없이 함 | Step 0 예고가 거짓말이 된다. 예고·예산·기본값 |
 | `BLOCKED.md` 를 자유 서술로 씀 | 아침 트리아지가 안 된다. 4열 구조화 |
+| 스타터 코드를 레포에 통째로 vendor | 수백 파일이 썩는다. `scaffold.json` 으로 외부 pin |
+| `verify_bootstrap` green 확인 없이 스캐폴드 위에 루프 | 깨진 베이스라인 → 원인 못 찾는다 |
+| 웹 SaaS 아닌데 스캐폴드 강요 | 한 스택은 한 시장만. 안 맞으면 스캐폴드 없이 |
 
 ## Related
 
