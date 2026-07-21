@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.9.0-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.10.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -97,6 +97,7 @@ claude
 | **`VERIFY.md` 증거 강제** | 훅이 **9군데**에서 루프를 죽입니다 — 막지 말고 **터미널 출력을 남기게** |
 | **`<promise>` 태그 필수** | 태그 없이 문구만 쓰면 **루프가 영원히 안 끝납니다** ↓ |
 | **취소 금지** | `/ralph-loop:cancel-ralph` · 상태파일 삭제는 완료 안 됐는데 빠져나가는 문 |
+| **브라우저 검증 (있을 때)** | `[e2e]` AC 를 Playwright 로 실제 클릭. 브라우저 없으면 오늘처럼 BLOCKED — **완전 additive** |
 
 ### `<promise>` 태그가 왜 필수인지 — 훅 로직을 재현한 결과
 
@@ -163,14 +164,14 @@ git diff main..ralph/<slug> -- 'docs/features/*/*-tech-design.md'
 
 ### ★ 눈으로 볼 게 남나 — 조각을 고를 때 같이 보세요
 
-**무인에 제일 좋은 조각이 하필 눈에 제일 안 보입니다.** 이유가 같아요 — 순수 로직은 루프가 테스트로 잘 검증하지만 볼 게 없고, 화면은 눈에 보이지만 **루프가 렌더를 검증 못 합니다** (canvas 는 브라우저 없이 판정 불가).
+**무인에 제일 좋은 조각이 하필 눈에 제일 안 보입니다.** 이유가 같아요 — 순수 로직은 루프가 테스트로 잘 검증하지만 볼 게 없고, 화면은 눈에 보이지만 **루프가 렌더를 검증하려면 브라우저가 필요합니다** (canvas 는 브라우저 없이 판정 불가).
 
 | 조각 | 무인 적합도 | 눈으로 확인 |
 |---|---|---|
 | 검색 파이프라인 | ★★★ 순수 함수 | ❌ `pytest` 출력만 |
 | 채팅 프런트 | ★★☆ 백엔드 mock 필요 | ✅ 브라우저 |
 
-그래서 이 스킬은 **볼 게 없는 조각을 고르면 "확인용 최소 화면"을 묻지 않고 요구사항에 넣습니다** (승인 게이트에서 빼실 수 있게). 로직은 루프가 테스트로, 진짜 도는지는 아침에 당신이 브라우저로 — **디자인은 범위 밖으로 못 박아서** 루프가 CSS 에 몇 시간 쓰는 걸 막고요.
+그래서 이 스킬은 **볼 게 없는 조각을 고르면 "확인용 최소 화면"을 묻지 않고 요구사항에 넣습니다** (승인 게이트에서 빼실 수 있게). 로직은 루프가 테스트로, `[e2e]` AC 는 **브라우저가 있으면 루프가 Playwright 로 직접 클릭해 검증**하고 (없으면 아침에 당신이 브라우저로) — **디자인은 범위 밖으로 못 박아서** 루프가 CSS 에 몇 시간 쓰는 걸 막고요.
 
 ### 안 맞는 경우
 
