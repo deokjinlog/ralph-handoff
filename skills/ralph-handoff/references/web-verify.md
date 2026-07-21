@@ -16,18 +16,23 @@
 루프가 매 반복 이걸 먼저 판정합니다. **하나라도 아니면 브라우저 검증은 건너뛰고 `[e2e]` AC 는 BLOCKED 로.**
 
 ```bash
-# 1) Playwright 러너가 있나 (없으면 설치 시도 — 실패해도 루프를 죽이지 마라)
-npx playwright --version >/dev/null 2>&1 || npx playwright install --with-deps chromium >/dev/null 2>&1
-npx playwright --version >/dev/null 2>&1 || { echo "no-playwright"; }
+# 1) Playwright 러너가 있나 (없으면 설치 — 실패해도 루프를 죽이지 마라)
+npx playwright --version >/dev/null 2>&1 || npm i -D @playwright/test >/dev/null 2>&1
+npx playwright --version >/dev/null 2>&1 || { echo "no-runner"; }
 
-# 2) dev 서버 기동 명령이 CLAUDE.md 에 있나 (playwright.config 의 webServer 로 쓴다)
+# 2) ★ 브라우저가 실제로 launch 되나 — 버전 OK 여도 시스템 libs 부재로 못 뜬다 (실제로 터짐)
+npx playwright install chromium >/dev/null 2>&1
+npx playwright screenshot --browser=chromium about:blank /tmp/_pw_probe.png >/dev/null 2>&1 \
+  || { echo "no-browser-launch"; }   # ← BLOCKED. 최소 호스트면 sudo npx playwright install-deps 필요
+
+# 3) dev 서버 기동 명령이 CLAUDE.md 에 있나 (file:// 로만 검증하면 생략 가능)
 grep -iE 'dev 서버|npm run dev|pnpm dev|uvicorn|flask run|next dev' CLAUDE.md >/dev/null 2>&1 || echo "no-devserver"
 ```
 
-- **둘 다 OK** → 아래 "검증 실행" 으로.
-- **하나라도 실패** → `[e2e]` AC 를 `BLOCKED.md` 로. 확인 절차(주소·입력·기대 화면)를 적어서. **전체 루프는 계속.** (오늘과 동일)
+- **1·2 OK** → 아래 "검증 실행" 으로 (3 은 file:// 검증이면 없어도 됨).
+- **1 또는 2 실패** → `[e2e]` AC 를 `BLOCKED.md` 로. 확인 절차(주소·입력·기대 화면)를 적어서. **전체 루프는 계속.** (오늘과 동일)
 
-> 헤드리스 환경에서 브라우저 바이너리가 안 깔리는 건 흔합니다. **그건 실패가 아니라 fallback** 입니다 — BLOCKED 로 내리고 다음으로.
+> **★ `--version` 만으론 부족합니다 — 실제로 터진 함정.** Playwright 가 깔려도 `libnspr4.so` 같은 시스템 라이브러리가 없으면 브라우저가 **launch 단계에서** 죽습니다 (헤드리스 리눅스·WSL·CI 에서 흔함). 그래서 2 에서 **실제로 한 장 찍어봐야** 합니다 — 안 하면 루프가 "OK" 로 오판하고 런타임에 테스트가 깨져요. **launch 실패 = 실패가 아니라 fallback** → BLOCKED 로 내리고, `sudo npx playwright install-deps` 를 사람이 할 일로 `BLOCKED.md` 에 남깁니다.
 
 ---
 
@@ -115,6 +120,7 @@ export default defineConfig({
 | MCP 서버로 Playwright 물기 | 매 반복 컨텍스트만 먹는다. CLI 로 |
 | 스크린샷·trace 삭제 | 아침에 사람이 볼 유일한 렌더 증거다 |
 | CSS 클래스 셀렉터 | 확인용 화면 사소한 변경에 깨진다. role/label 로 |
+| 능력 감지를 `--version` 으로만 함 | 브라우저는 못 뜨는데 OK 로 오판 → 런타임 실패. **실제 launch 를 한 장 찍어봐라** |
 
 ---
 

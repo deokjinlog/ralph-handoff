@@ -537,8 +537,8 @@ REVIEW.md 있음             → 체크 안 된 첫 task
 
 **`PROMPT.md` 에 이 순서를 박으세요** (자세한 조각·AC→테스트 번역 규칙은 [`references/web-verify.md`](references/web-verify.md)):
 
-1. **능력 감지** — `npx playwright --version` 이 돌고, `CLAUDE.md` 에 dev 서버 기동 명령이 있나?
-   - 되면 → 2 로. **안 되면** → `[e2e]` AC 를 `BLOCKED.md` 로 (오늘과 동일, 확인 절차째). **전체 루프는 멈추지 마라.**
+1. **능력 감지** — `npx playwright --version` 이 돌고, **브라우저가 실제로 launch 되나** (`--version` OK 여도 시스템 libs 부재로 못 뜬다 — 실제로 터짐. 한 장 찍어 확인), `CLAUDE.md` 에 dev 서버 명령이 있나?
+   - 되면 → 2 로. **안 되면** → `[e2e]` AC 를 `BLOCKED.md` 로 (오늘과 동일, 확인 절차째. 최소 호스트면 `sudo npx playwright install-deps` 를 사람 몫으로). **전체 루프는 멈추지 마라.**
 2. **각 `[e2e]` AC 는 `e2e/` 아래 Playwright 테스트로 존재해야 한다.** 없으면 그 AC 는 미완료다.
 3. **검증 명령**: `npx playwright test --reporter=line` 의 **터미널 출력 전문**을 `VERIFY.md` 에 붙인다. 실패 시 `test-results/` 의 스크린샷 경로도. **스크린샷은 증거다 — 지우지 마라.**
 4. **flaky** (retries 후에도 불안정) 면 그 AC 를 무한 재시도하지 말고 `BLOCKED.md` 로 강등해라. `retries: 1` 고정.
@@ -632,6 +632,7 @@ git worktree remove ../<repo>-ralph-<slug>     # 버릴 때
 | 브라우저 못 띄우는 걸 완료 조건에 걸음 | **루프가 영원히 안 끝난다.** `[e2e]` 는 통과 OR BLOCKED 면 완료 |
 | flaky E2E 를 무한 재시도 | 루프가 헛돈다. `retries:1` + flaky 면 `BLOCKED.md` 로 강등 |
 | Playwright 를 MCP 서버로 붙임 | 매 반복 컨텍스트만 먹는다. `npx playwright` CLI 를 bash 로 |
+| 능력 감지를 `--version` 으로만 함 | 브라우저는 못 뜨는데 OK 로 오판 → 런타임 실패. 실제 launch 를 찍어봐라 |
 
 ## Related
 
