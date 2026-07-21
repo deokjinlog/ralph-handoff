@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.12.1-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.12.2-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -55,11 +55,13 @@ claude
 **시작하자마자 질문 계획을 먼저 알려줍니다** — 몇 번 물을 건지, 뭘 물을 건지, 나머지는 뭘 알아서 할 건지. 그래야 대응할 준비가 되니까요.
 
 ```
-     │ ℹ️ "여쭐 건 2번입니다. 나머지는 알아서."   ← 먼저 예고
-     │ …docs/ 뒤져서 기획서 읽음…
-     │ 기획서가 크면 → "어느 조각 넘길까요?"        ← 멈춤 ①
-     │ …요구사항 + CLAUDE.md 작성…
-     │ 📄 둘 다 한 번에 → "이대로 넘길까요?"        ← 멈춤 ②
+     │ ℹ️ "여쭐 건 N번입니다. 나머지는 알아서."   ← 먼저 예고
+     │
+     │ ┌ 기획서 있으면 → 읽음 → (크면) "어느 조각?"           ← 멈춤 ①
+     │ └ 기획서 없으면 → 소크라테스 인테이크(증분2):
+     │      "빈 슬롯 N개, 최대 3~5문" → ①누가? ②핵심 저니? ③제약?
+     │ …요구사항 + CLAUDE.md 작성 (안 물은 슬롯은 기본값)…
+     │ 📄 둘 다 한 번에 → "이대로 넘길까요?"                  ← 멈춤 ②
      ▼
      └─ 커밋 → (지킬 코드 있으면) 워크트리 → PROMPT.md → "이 명령을 치세요"
 ```
@@ -67,6 +69,57 @@ claude
 **나머지는 안 묻습니다.**
 
 **워크트리는 지킬 코드가 있을 때만** 만듭니다. 빈 프로젝트면 현재 폴더에서 브랜치만 파요 — 지킬 게 없는데 폴더를 늘리면 헷갈리기만 하니까요.
+
+---
+
+## 실행 런북 — 소크라테스 문답부터 루프까지
+
+**① 설치 (한 번):**
+
+```
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin install ralph-loop@claude-plugins-official
+/plugin marketplace add deokjinlog/ralph-handoff
+/plugin install ralph-handoff@ralph-handoff
+```
+세션을 재시작합니다.
+
+**② 프로젝트 폴더 (한 번):**
+
+```bash
+mkdir -p ~/projects/내프로젝트 && cd ~/projects/내프로젝트
+git init && claude
+```
+
+**③ 발동 — `/ralph-handoff` (또는 "랄프한테 넘겨줘"):**
+
+- **기획서가 있으면** (`docs/*.pptx|pdf|md`) → 읽고, 크면 조각을 물어봅니다 (멈춤①).
+- **기획서가 없으면 → 소크라테스 인테이크.** 먼저 예고하고, 빈 슬롯을 3~5문으로 채웁니다:
+
+```
+ℹ️ 기획 자료가 없네요 → 스키마 인테이크.
+   빈 슬롯 6개를 최대 3~5문으로 채우고 나머지는 기본값 → 승인 1번.
+   ① 누가 쓰나요? (결제 주체 ≠ 사용 주체?)
+   ② 돈 되는 핵심 저니 하나
+   ③ 만들거나-부수는 제약 하나
+```
+
+당신 답으로 슬롯(persona · 저니 · 기능+AC · NFR · 범위밖 · 데이터모델)이 채워지고, **안 물은 슬롯은 "기본값 + 근거"** 로 채워집니다.
+
+**④ 승인 (멈춤② — 유일한 방어선):** 요구사항 + `CLAUDE.md` 를 한 번에 보여주고 "이대로 넘길까요?" 를 묻습니다.
+
+**⑤ 자동 (안 묻습니다):** 커밋 → (지킬 코드 있으면) 워크트리, 없으면 브랜치 → `PROMPT.md` 생성 → **실행 명령 출력**.
+
+**⑥ 루프 켜기 (당신이 — 도구는 안 켭니다):**
+
+```
+cd <경로> && claude
+/ralph-loop:ralph-loop "PROMPT.md 를 읽고 그대로 따라라." --completion-promise "<완료문구>" --max-iterations 30
+```
+
+**⑦ 아침에:** `cat VERIFY.md` (검증 증거) · `cat REVIEW.md` (검문) · `cat BLOCKED.md` (4열 트리아지) · `git log --oneline`.
+
+> **소크라테스 인테이크는 "질문 두 번" 을 안 깹니다** — 기획서 있을 때의 2번(조각+승인)과 다른 레짐일 뿐입니다. no-doc 엔 조각 선택이 없고 **예고된 3~5문 + 승인 1번**이며, 원칙(예고·예산·기본값)은 동일합니다.
 
 ---
 
