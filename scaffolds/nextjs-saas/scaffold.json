@@ -20,6 +20,8 @@
     "lib/db/schema.ts",
     "components/features/**"
   ],
-  "verify_bootstrap": "pnpm install && pnpm build && pnpm test",
+  "verify_bootstrap": "pnpm install && pnpm exec tsc --noEmit",
+  "needs_human_env": ["POSTGRES_URL", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "AUTH_SECRET", "BASE_URL"],
+  "verify_note": "실측 2026-07-21: install·tsc 는 자율 green. build/dev 는 needs_human_env(Postgres·Stripe) 없이 죽는다 → BLOCKED(사람). test 스크립트 없음.",
   "dev_server": "pnpm dev"
 }

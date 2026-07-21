@@ -22,11 +22,13 @@
 # 격리 폴더엔 이미 CLAUDE.md·requirements·.git 이 있다 → 빈 폴더 클론 불가. 임시로 받아 내용만 얹는다:
 git clone --depth 1 <source.url> .scaffold-tmp
 rm -rf .scaffold-tmp/.git && cp -rn .scaffold-tmp/. . && rm -rf .scaffold-tmp   # -n: 기존 .gitignore·CLAUDE.md·requirements 보존
-pnpm install && pnpm build && pnpm test          # = scaffold.json.verify_bootstrap ("깔린 직후 green")
+pnpm install && pnpm exec tsc --noEmit           # = scaffold.json.verify_bootstrap (자율 green: install + 타입체크)
 git add -A && git commit -q -m "chore: 스캐폴드 baseline (green)"
 ```
 
 **green 이 안 나오면 클론을 버리고 스캐폴드 없이 진행한다** — 사람에게 한 줄 알림. (스타터가 낡았을 수 있다. 깨진 베이스라인 위에 도메인 로직을 얹으면 원인을 못 찾는다.)
+
+> **★ 실측(2026-07-21, `nextjs/saas-starter`):** `pnpm install`·`tsc --noEmit` 은 **자율로 green**. 하지만 `pnpm build`·`pnpm dev` 는 **Postgres·Stripe·AUTH_SECRET env 를 요구**해 죽는다 (`POSTGRES_URL is not set`). `test` 스크립트는 없다. 그래서 **full build/dev green 은 자율로 못 낸다** — `scaffold.json.needs_human_env` 의 DB·결제 셋업은 `BLOCKED.md` 로 사람에게 넘긴다 (이 레포의 *"DB·결제 = 사람 몫"* 경계 그대로). **스캐폴드의 자율 green 은 install + 타입체크까지다.** dev 서버도 env 가 있어야 뜨므로, env 없으면 [e2e] 브라우저 검증(6-8)도 BLOCKED 로 떨어진다.
 
 **3. `CLAUDE.partial.md` 병합** — `scaffolds/nextjs-saas/CLAUDE.partial.md` 를 `CLAUDE.md` 뒤에 붙인다. 이게 `locked_paths` 규칙을 `CLAUDE.md` 에 박는다.
 
