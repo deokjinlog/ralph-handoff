@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.12.4-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.13.0-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -110,6 +110,7 @@ git log --oneline
 | **`VERIFY.md` 증거 강제** | 훅이 **9군데**에서 루프를 죽입니다 — 막지 말고 **터미널 출력을 남기게** |
 | **`<promise>` 태그 필수** | 태그 없이 문구만 쓰면 **루프가 영원히 안 끝납니다** ↓ |
 | **브라우저 검증 (있을 때)** *(신규)* | `[e2e]` AC 를 Playwright 로 실제 클릭. 브라우저 없으면 BLOCKED. **무인 실행 사고 기록이 아니라 스모크 실측 기반** |
+| **병렬 슬라이스** *(신규 · opt-in)* | 안 겹치는 조각 2~3개를 워크트리로 갈라 동시에. 조각 하나면 아무 일도 안 함. **관측 1건 기반 — 척추를 분기 전에 세워야 함** |
 | **취소 금지** | 완료 안 됐는데 빠져나가는 문을 막습니다 |
 
 **`<promise>` 태그가 왜 필수인가** — 훅의 `perl … <promise>(.*?)</promise> …` 는 **매치가 없으면 원본을 그대로 둡니다.** 태그가 없으면 비교 대상이 **메시지 전체**가 되는데, **LLM 은 거의 항상 앞에 한 줄 붙입니다.** → 매치 실패 → `--max-iterations` 를 다 돌고 죽어요. 그래서 `PROMPT.md` 에 **태그째** 박습니다.
