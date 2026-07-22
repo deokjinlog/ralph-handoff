@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.12.3-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.12.4-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -63,7 +63,7 @@ claude
 **③ 발동 — `/ralph-handoff`** (또는 그냥 "랄프한테 넘겨줘")
 
 - **기획서가 있으면** → 읽고, 크면 어느 조각을 넘길지 물어봅니다 ← **멈춤 ①**
-- **기획서가 없으면 → 소크라테스 인테이크.** 먼저 예고하고, 빈 슬롯을 3~5문으로 채웁니다:
+- **기획서가 없으면 → 스키마 인테이크** (소크라테스식이되 **자유 대화가 아니라 빈 슬롯 채우기**). 먼저 예고하고 3~5문으로 채웁니다:
 
 ```
 ℹ️ 기획 자료가 없네요 → 스키마 인테이크.
@@ -95,11 +95,11 @@ cat BLOCKED.md   # 막힌 것 · 사람이 볼 것 (4열 트리아지)
 git log --oneline
 ```
 
-> **소크라테스 인테이크는 "질문 두 번" 을 안 깹니다** — 기획서 있을 때의 2번(조각+승인)과 **다른 레짐**일 뿐입니다. no-doc 엔 조각 선택이 없고 **예고된 3~5문 + 승인 1번**이며, 원칙(예고·예산·기본값)은 동일합니다.
+> **멈춤은 여전히 최대 두 번입니다** — no-doc 엔 조각 선택이 없어 **인터뷰(예고된 3~5문) + 승인 1번**으로 끝납니다.
 
 ---
 
-## `PROMPT.md` 에 뭐가 들어가나 — 전부 실제로 터진 것들
+## `PROMPT.md` 에 뭐가 들어가나 — 대부분 실제로 터진 것들
 
 | 장치 | 뭘 막나 |
 |---|---|
@@ -109,7 +109,7 @@ git log --oneline
 | **검문 관문** | **자기 답안지로 자기 채점.** 다른 목적의 서브에이전트가 계획서만 가로질러 읽습니다 |
 | **`VERIFY.md` 증거 강제** | 훅이 **9군데**에서 루프를 죽입니다 — 막지 말고 **터미널 출력을 남기게** |
 | **`<promise>` 태그 필수** | 태그 없이 문구만 쓰면 **루프가 영원히 안 끝납니다** ↓ |
-| **브라우저 검증 (있을 때)** | `[e2e]` AC 를 Playwright 로 실제 클릭. 브라우저 없으면 BLOCKED — **완전 additive** |
+| **브라우저 검증 (있을 때)** *(신규)* | `[e2e]` AC 를 Playwright 로 실제 클릭. 브라우저 없으면 BLOCKED. **무인 실행 사고 기록이 아니라 스모크 실측 기반** |
 | **취소 금지** | 완료 안 됐는데 빠져나가는 문을 막습니다 |
 
 **`<promise>` 태그가 왜 필수인가** — 훅의 `perl … <promise>(.*?)</promise> …` 는 **매치가 없으면 원본을 그대로 둡니다.** 태그가 없으면 비교 대상이 **메시지 전체**가 되는데, **LLM 은 거의 항상 앞에 한 줄 붙입니다.** → 매치 실패 → `--max-iterations` 를 다 돌고 죽어요. 그래서 `PROMPT.md` 에 **태그째** 박습니다.

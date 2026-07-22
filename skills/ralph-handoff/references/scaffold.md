@@ -1,6 +1,8 @@
 # 골든 스캐폴드 — 배관을 루프가 안 짜게 (opt-in)
 
-> SKILL.md Step 4·5 의 상세본. **웹 SaaS 그린필드일 때만.** 완전 opt-in — 안 쓰면 오늘과 동일.
+> SKILL.md Step 4·5 의 상세본이자 **절차의 정본**. **웹 SaaS 그린필드일 때만.** 완전 opt-in — 안 쓰면 오늘과 동일.
+>
+> **★ 이 파일의 모든 `scaffolds/` 경로는 `${CLAUDE_PLUGIN_ROOT}` 기준입니다.** 설치된 플러그인은 `~/.claude/plugins/cache/` 로 복사되므로, `cwd` 아래에서 찾으면 **없습니다** (스킬이 `cwd` 만 본다는 규칙의 예외 — 스캐폴드 자산은 플러그인 안에 있다).
 
 ## 왜
 
@@ -16,6 +18,8 @@
 
 **1. 채택은 승인 게이트에서 (Step 4)** — 새 멈춤을 만들지 마라. `CLAUDE.md` 초안에 "스캐폴드: nextjs-saas 적용" 을 넣고, 멈춤② 에서 사람이 빼게 한다. (확인용 화면 FR 과 같은 "넣어두고 빼게" 규칙)
 
+> **`scaffold.json` 의 `pin` 이 아직 placeholder 면 자동 채택하지 마라.** 어느 시점 코드가 들어올지 모르는 채로 외부 레포 수백 파일을 얹는 셈이다 — `BLOCKED.md` 에 "스캐폴드 pin 미지정" 으로 남기고 스캐폴드 없이 진행한다.
+
 **2. 클론 + green 베이스라인 (승인 후 Step 5, 격리 안에서):**
 
 ```bash
@@ -30,7 +34,7 @@ git add -A && git commit -q -m "chore: 스캐폴드 baseline (green)"
 
 > **★ 실측(2026-07-21, `nextjs/saas-starter`):** `pnpm install`·`tsc --noEmit` 은 **자율로 green**. 하지만 `pnpm build`·`pnpm dev` 는 **Postgres·Stripe·AUTH_SECRET env 를 요구**해 죽는다 (`POSTGRES_URL is not set`). `test` 스크립트는 없다. 그래서 **full build/dev green 은 자율로 못 낸다** — `scaffold.json.needs_human_env` 의 DB·결제 셋업은 `BLOCKED.md` 로 사람에게 넘긴다 (이 레포의 *"DB·결제 = 사람 몫"* 경계 그대로). **스캐폴드의 자율 green 은 install + 타입체크까지다.** dev 서버도 env 가 있어야 뜨므로, env 없으면 [e2e] 브라우저 검증(6-8)도 BLOCKED 로 떨어진다.
 
-**3. `CLAUDE.partial.md` 병합** — `scaffolds/nextjs-saas/CLAUDE.partial.md` 를 `CLAUDE.md` 뒤에 붙인다. 이게 `locked_paths` 규칙을 `CLAUDE.md` 에 박는다.
+**3. `CLAUDE.partial.md` 병합** — `${CLAUDE_PLUGIN_ROOT}/scaffolds/nextjs-saas/CLAUDE.partial.md` 를 프로젝트 `CLAUDE.md` 뒤에 붙인다. 이게 `locked_paths` 규칙을 `CLAUDE.md` 에 박는다. **이 병합이 빠지면 락·shadcn 고정·dev 서버 명시가 통째로 사라진다.**
 
 ## 락 강제 — 런타임 규칙(6-6), 새 게이트 없음
 

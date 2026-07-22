@@ -16,8 +16,8 @@
 루프가 매 반복 이걸 먼저 판정합니다. **하나라도 아니면 브라우저 검증은 건너뛰고 `[e2e]` AC 는 BLOCKED 로.**
 
 ```bash
-# 1) Playwright 러너가 있나 (없으면 설치 — 실패해도 루프를 죽이지 마라)
-npx playwright --version >/dev/null 2>&1 || npm i -D @playwright/test >/dev/null 2>&1
+# 1) Playwright 러너가 프로젝트에 있나 — 없으면 설치하지 마라.
+#    허용 목록 밖 의존성은 6-6 대로 BLOCKED 다 (검증기가 자기 규칙을 어기면 안 된다).
 npx playwright --version >/dev/null 2>&1 || { echo "no-runner"; }
 
 # 2) ★ 브라우저가 실제로 launch 되나 — 버전 OK 여도 시스템 libs 부재로 못 뜬다 (실제로 터짐)
