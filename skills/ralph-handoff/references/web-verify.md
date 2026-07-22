@@ -18,7 +18,7 @@
 ```bash
 # 1) Playwright 러너가 프로젝트에 있나 — 없으면 설치하지 마라.
 #    허용 목록 밖 의존성은 6-6 대로 BLOCKED 다 (검증기가 자기 규칙을 어기면 안 된다).
-npx playwright --version >/dev/null 2>&1 || { echo "no-runner"; }
+npx playwright --version >/dev/null 2>&1 || { echo "no-runner"; exit 1; }   # ★ exit 없으면 아래 install 이 그냥 돈다
 
 # 2) ★ 브라우저가 실제로 launch 되나 — 버전 OK 여도 시스템 libs 부재로 못 뜬다 (실제로 터짐)
 npx playwright install chromium >/dev/null 2>&1

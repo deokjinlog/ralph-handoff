@@ -48,7 +48,7 @@ git add -A && git commit -q -m "chore: 스캐폴드 baseline (green)"
 ## 증분1·2 와의 연결
 
 - 스캐폴드가 `dev_server`(`pnpm dev`)를 `CLAUDE.md` 에 넣어줌 → **증분1 브라우저 검증(6-8)의 능력 감지가 더 자주 통과.**
-- `shadcn/ui` 고정 → README 가 지적한 *"루프가 CSS 에 몇 시간"* 을 구조적으로 차단.
+- `shadcn/ui` 고정 → `SKILL.md` 가 지적한 *"루프가 CSS 에 몇 시간"* 을 구조적으로 차단.
 
 ## 하지 말 것
 
@@ -59,4 +59,4 @@ git add -A && git commit -q -m "chore: 스캐폴드 baseline (green)"
 | `verify_bootstrap` green 확인 없이 루프 시작 | 깨진 베이스라인 위 도메인 로직 → 원인 못 찾는다 |
 | 웹 SaaS 아닌데 스캐폴드 강요 | 한 스택은 한 시장만. 안 맞으면 스캐폴드 없이 |
 | `locked_paths` 를 루프가 수정 | 배관이 다시 틀린다. `BLOCKED.md` 로 |
-| 스캐폴드 채택에 새 멈춤 추가 | 승인 게이트에서 한 줄로. **멈춤은 여전히 1번** |
+| 스캐폴드 채택에 새 멈춤 추가 | 승인 게이트에서 한 줄로. **멈춤은 여전히 최대 2번** |
