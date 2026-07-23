@@ -701,7 +701,7 @@ echo "$PROMISE"                                                  # → VECTOR_SE
 
 > **존재하지 않는 `../<repo>-ralph-<slug>` 로 `cd` 하라고 안내하지 마세요.** 빈 프로젝트엔 그 폴더가 없습니다.
 
-**③ 병렬 조각 여럿** — 명령을 **조각 수만큼** 내고, 완료 문구를 조각마다 다르게 하세요. 형식은 [`references/parallel-slices.md`](references/parallel-slices.md) 절차 3.
+**③ 병렬 조각 여럿** — 명령을 **조각 수만큼** 내고, 완료 문구를 조각마다 다르게 하세요. 형식은 [`references/parallel-slices.md`](references/parallel-slices.md) 절차 3. **다화면 앱을 화면별로 조각낼 땐** [`references/big-app-slicing.md`](references/big-app-slicing.md).
 
 **세 경우 공통으로 뒤에 붙일 것:**
 
@@ -750,6 +750,8 @@ git worktree remove ../<repo>-ralph-<slug>     # 버릴 때
 - **되돌리기 어려운 작업 포함** (DB 마이그레이션 · 배포) → 루프는 파괴적 작업이 금지라 전부 `BLOCKED.md` 로 갑니다. 사람이 하세요
 
 **규모의 현실 — 큰 앱은 한 번의 무인 실행으로 안 끝납니다.** 한 반복 = 한 단계라(컨텍스트 보호), AC 가 수십 개면 1스텝/반복으로는 완주가 안 됩니다. 화면 10개짜리 통합 앱 벤치마크(academy-saas) 관측: 랄프는 **개발방향·구현계획서(백트래킹·탐색상한·독립검사기까지)는 완주**했지만 코드는 완주 못 했습니다. 큰 걸 무인으로 재우려면 **조각을 잘게(화면 하나=한 조각)·수직으로 자르고, AC 를 채점표로 두세요.** 완주가 아니라 **부분 점수가 정상**입니다 — 단 '몇 개 green' 은 **아침에 사람이 보는 트리아지 기준**이지 루프의 완료조건이 아닙니다(완료조건은 6-3 그대로, 사람이 센 숫자 금지).
+
+> **큰 앱을 실제로 어떻게 조각내나 — 척추 하나 + 화면 조각 N개.** 공유되는 것(도메인·저장소·**UI 헬퍼·여러 화면이 쓰는 로직**·셸 스텁 배선)을 **척추가 다 흡수**하면, 각 화면이 다른 조각을 import 하지 않는 독립 수직 조각(AC 2~9개)이 됩니다. 절차·함정·academy 매핑: [`references/big-app-slicing.md`](references/big-app-slicing.md)
 
 ## Anti-Patterns
 
