@@ -5,7 +5,7 @@
 ### 요구사항까지만 승인하고, 나머지는 자고 일어나면 돼 있게
 
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.14.1-7c3aed?style=flat-square&labelColor=0d1117">
+  <img alt="Version" src="https://img.shields.io/badge/version-0.14.2-7c3aed?style=flat-square&labelColor=0d1117">
   <img alt="Claude Code" src="https://img.shields.io/badge/Claude%20Code-Plugin-a78bfa?style=flat-square&labelColor=0d1117">
   <img alt="Requires" src="https://img.shields.io/badge/requires-ralph--loop-f97316?style=flat-square&labelColor=0d1117">
   <img alt="License" src="https://img.shields.io/badge/license-MIT-22c55e?style=flat-square&labelColor=0d1117">
@@ -159,6 +159,8 @@ git log --oneline
 | **계획을 검토할 사람** | 루프가 쓴 계획을 루프가 실행합니다. **검문 관문**을 넣었지만 완벽하진 않아요 — 아침에 개발방향을 꼭 읽어보세요 |
 
 **안 맞는 경우** — 기술 선택이 중요할 때 · 요구사항이 모호할 때(루프가 추측으로 메웁니다) · **되돌리기 어려운 작업**(DB 마이그레이션 · 결제 실연동 · 배포)이 포함될 때. 마지막은 전부 `BLOCKED.md` 로 갑니다. **사람이 하세요.**
+
+**규모의 현실** — AC 가 수십 개인 큰 앱은 한 번의 무인 실행으로 안 끝납니다(한 반복=한 단계라 처리량이 벽). 벤치마크 실측: 랄프는 **설계를 사람 수준으로** 잡지만 코드는 완주 못 합니다. 큰 건 **화면 하나=한 조각**으로 잘게·수직으로 자르고, AC 채점표의 **부분 점수**를 정상으로 보세요.
 
 **조각은 층이 아니라 기능으로 — 수직으로 자릅니다.** 한 조각이 *입력 → 로직 → 화면*을 관통해야 합니다. "엔진 층 / 화면 층" 으로 자르면 로직 조각은 **정의상 아침에 볼 게 없습니다** (실제로 터졌습니다 — 테스트 16개 green, 볼 것 0).
 
